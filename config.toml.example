@@ -1,0 +1,93 @@
+# NTRIP Caster 配置文件示例
+# 重命名为 config.toml 并根据实际环境修改
+
+[node]
+id = "node-01"
+name = "Primary NTRIP Node"
+bind_addr = "0.0.0.0:2101"
+ip = "192.168.1.100"
+max_connections = 1000
+
+[cache]
+default_ttl = 300
+# 缓存同步间隔(秒)
+sync_interval = 60
+# 最大缓存大小
+max_size = 10000
+# 是否启用写回模式
+write_back = true
+
+[storage.etcd]
+endpoints = ["http://192.168.1.101:2379", "http://192.168.1.102:2379"]
+prefix = "/ntripcaster/v1"
+connect_timeout = 5000
+max_retries = 3
+
+[storage.rqlite]
+addr = "http://192.168.1.103:4001"
+username = "ntripadmin"
+password = "secure_password_here"
+connect_timeout = 5000
+max_retries = 3
+
+[connection.upload]
+read_buffer_size = 4096
+max_idle_time = 300
+enable_rtcm_parsing = true
+max_upload_rate = 1048576
+
+[connection.download]
+send_buffer_size = 8192
+max_idle_time = 60
+batch_threshold = 1024
+max_download_rate = 2097152
+
+[connection.relay]
+connect_timeout = 10000
+read_buffer_size = 8192
+heartbeat_interval = 30
+max_retries = 5
+retry_delay = 2000
+
+[relay]
+enable_external = true
+max_external_casters = 5
+reconnect_interval = 60
+
+[stats]
+enable = true
+collection_interval = 10
+history_size = 10080
+
+[log]
+level = "info"
+format = "json"
+output = ["stdout", "/var/log/ntripcaster/"]
+max_file_size = 10485760
+max_backup_files = 10
+
+[api]
+bind_addr = "0.0.0.0:8080"
+enable_auth = true
+username = "admin"
+password_hash = "$2a$10$examplehashhere"
+rate_limit = 100
+
+[external_casters]
+[[external_casters.caster]]
+name = "Public Caster"
+host = "caster.example.com"
+port = 2101
+mountpoints = ["RTCM32", "RTCM33"]
+username = "user"
+password = "pass"
+reconnect_interval = 30
+
+[[external_casters.caster]]
+name = "Backup Caster"
+host = "backup-caster.example.com"
+port = 2101
+mountpoints = ["RTCM32"]
+username = "user"
+password = "pass"
+reconnect_interval = 60
